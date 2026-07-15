@@ -1,4 +1,9 @@
+import Link from "next/link";
+import { TrendingUp, Plus } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   AnalyticsClient,
   type TruckPerf,
@@ -57,9 +62,36 @@ export default async function AnalyticsPage() {
     .sort((a, b) => b.netProfit - a.netProfit)
     .slice(0, 10);
 
+  if (trucks.length === 0) {
+    return (
+      <div>
+        <PageHeader
+          eyebrow="Insights"
+          title="Analytics"
+          description="Business insights: trends, comparisons and performance."
+        />
+        <Card>
+          <EmptyState
+            icon={TrendingUp}
+            title="No analytics yet"
+            description="Add truck trips and payments to unlock revenue trends, profit analysis, transportation savings and performance comparisons."
+            action={
+              <Link href="/trucks">
+                <Button>
+                  <Plus className="h-4 w-4" /> Add your first trip
+                </Button>
+              </Link>
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div>
       <PageHeader
+        eyebrow="Insights"
         title="Analytics"
         description="Business insights: trends, comparisons and performance."
       />

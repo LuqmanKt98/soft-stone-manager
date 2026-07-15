@@ -260,7 +260,7 @@ export function ReportsClient({
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 stagger">
         <StatCard label="Revenue" value={formatPKR(totals.salesRevenue)} icon={Banknote} accent="primary" />
         <StatCard label="Purchase Cost" value={formatPKR(totals.purchaseCost)} icon={ShoppingCart} accent="chart-6" />
         <StatCard

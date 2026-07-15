@@ -13,12 +13,15 @@ import {
   CalendarRange,
   ShoppingCart,
   ArrowRight,
+  Plus,
 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
+import { DashboardOnboarding } from "@/components/dashboard/onboarding";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -49,12 +52,34 @@ function pctDelta(cur: number, prev: number): number | undefined {
   return ((cur - prev) / Math.abs(prev)) * 100;
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="mb-3 mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+      {children}
+    </h2>
+  );
+}
+
 export default async function DashboardPage() {
-  const { trucks, payments } = await getAllData();
+  const { trucks, payments, settings } = await getAllData();
   const now = new Date();
   const m = computeDashboard(trucks, payments, now);
 
-  // Deltas vs previous comparable period
+  const isEmpty = trucks.length === 0 && payments.length === 0;
+
+  if (isEmpty) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          eyebrow="Dashboard"
+          title={`Welcome to ${settings.businessName}`}
+          description="A quick setup to get your business running."
+        />
+        <DashboardOnboarding businessName={settings.businessName} />
+      </div>
+    );
+  }
+
   const yesterday = subDays(now, 1);
   const prevDay = periodMetrics(
     trucks,
@@ -90,119 +115,135 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Overview"
         title="Dashboard"
-        description={`Overview · ${formatDate(now)}`}
-      />
+        description={formatDate(now)}
+      >
+        <Link href="/trucks">
+          <Button>
+            <Plus className="h-4 w-4" /> Add Trip
+          </Button>
+        </Link>
+      </PageHeader>
 
       {/* Primary KPIs */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          label="Today's Sales"
-          value={formatPKR(m.today.totals.salesRevenue)}
-          icon={Banknote}
-          accent="primary"
-          delta={
-            pctDelta(m.today.totals.salesRevenue, prevDay.totals.salesRevenue) !== undefined
-              ? { value: pctDelta(m.today.totals.salesRevenue, prevDay.totals.salesRevenue)! }
-              : undefined
-          }
-          hint="vs yesterday"
-        />
-        <StatCard
-          label="Today's Profit / Loss"
-          value={formatPKR(m.today.totals.netProfit)}
-          icon={TrendingUp}
-          accent={m.today.totals.netProfit >= 0 ? "chart-2" : "destructive"}
-          tone={m.today.totals.netProfit >= 0 ? "positive" : "negative"}
-          hint={`${m.today.totals.truckCount} trips today`}
-        />
-        <StatCard
-          label="Weekly Sales"
-          value={formatPKR(m.week.totals.salesRevenue)}
-          icon={CalendarDays}
-          accent="chart-5"
-          delta={
-            pctDelta(m.week.totals.salesRevenue, prevWeek.totals.salesRevenue) !== undefined
-              ? { value: pctDelta(m.week.totals.salesRevenue, prevWeek.totals.salesRevenue)! }
-              : undefined
-          }
-          hint="vs last week"
-        />
-        <StatCard
-          label="Monthly Sales"
-          value={formatPKR(m.month.totals.salesRevenue)}
-          icon={CalendarRange}
-          accent="chart-7"
-          delta={
-            pctDelta(m.month.totals.salesRevenue, prevMonth.totals.salesRevenue) !== undefined
-              ? { value: pctDelta(m.month.totals.salesRevenue, prevMonth.totals.salesRevenue)! }
-              : undefined
-          }
-          hint="vs last month"
-        />
+      <div>
+        <SectionLabel>Today &amp; recent</SectionLabel>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 stagger">
+          <StatCard
+            label="Today's Sales"
+            value={formatPKR(m.today.totals.salesRevenue)}
+            icon={Banknote}
+            accent="primary"
+            delta={
+              pctDelta(m.today.totals.salesRevenue, prevDay.totals.salesRevenue) !== undefined
+                ? { value: pctDelta(m.today.totals.salesRevenue, prevDay.totals.salesRevenue)! }
+                : undefined
+            }
+            hint="vs yesterday"
+          />
+          <StatCard
+            label="Today's Profit / Loss"
+            value={formatPKR(m.today.totals.netProfit)}
+            icon={TrendingUp}
+            accent={m.today.totals.netProfit >= 0 ? "chart-2" : "destructive"}
+            tone={m.today.totals.netProfit >= 0 ? "positive" : "negative"}
+            hint={`${m.today.totals.truckCount} trips today`}
+          />
+          <StatCard
+            label="Weekly Sales"
+            value={formatPKR(m.week.totals.salesRevenue)}
+            icon={CalendarDays}
+            accent="chart-5"
+            delta={
+              pctDelta(m.week.totals.salesRevenue, prevWeek.totals.salesRevenue) !== undefined
+                ? { value: pctDelta(m.week.totals.salesRevenue, prevWeek.totals.salesRevenue)! }
+                : undefined
+            }
+            hint="vs last week"
+          />
+          <StatCard
+            label="Monthly Sales"
+            value={formatPKR(m.month.totals.salesRevenue)}
+            icon={CalendarRange}
+            accent="chart-7"
+            delta={
+              pctDelta(m.month.totals.salesRevenue, prevMonth.totals.salesRevenue) !== undefined
+                ? { value: pctDelta(m.month.totals.salesRevenue, prevMonth.totals.salesRevenue)! }
+                : undefined
+            }
+            hint="vs last month"
+          />
+        </div>
       </div>
 
       {/* Financial KPIs */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          label="Outstanding Balance"
-          value={formatPKR(m.outstanding)}
-          icon={Receipt}
-          accent={m.outstanding > 0 ? "chart-6" : "success"}
-          hint="Receivable from company"
-        />
-        <StatCard
-          label="Payments Received"
-          value={formatPKR(m.paymentsReceivedAllTime)}
-          icon={Wallet}
-          accent="chart-2"
-          hint="All time"
-        />
-        <StatCard
-          label="Net Profit"
-          value={formatPKR(a.netProfit)}
-          icon={PiggyBank}
-          accent={a.netProfit >= 0 ? "chart-2" : "destructive"}
-          tone={a.netProfit >= 0 ? "positive" : "negative"}
-          hint="All time"
-        />
-        <StatCard
-          label="Transportation Savings"
-          value={formatPKR(a.transportSavings)}
-          icon={Coins}
-          accent="chart-5"
-          hint="Negotiated vs company rate"
-        />
+      <div>
+        <SectionLabel>Financials</SectionLabel>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 stagger">
+          <StatCard
+            label="Outstanding Balance"
+            value={formatPKR(m.outstanding)}
+            icon={Receipt}
+            accent={m.outstanding > 0 ? "chart-6" : "success"}
+            hint="Receivable from company"
+          />
+          <StatCard
+            label="Payments Received"
+            value={formatPKR(m.paymentsReceivedAllTime)}
+            icon={Wallet}
+            accent="chart-2"
+            hint="All time"
+          />
+          <StatCard
+            label="Net Profit"
+            value={formatPKR(a.netProfit)}
+            icon={PiggyBank}
+            accent={a.netProfit >= 0 ? "chart-2" : "destructive"}
+            tone={a.netProfit >= 0 ? "positive" : "negative"}
+            hint="All time"
+          />
+          <StatCard
+            label="Transportation Savings"
+            value={formatPKR(a.transportSavings)}
+            icon={Coins}
+            accent="chart-5"
+            hint="Negotiated vs company rate"
+          />
+        </div>
       </div>
 
       {/* Operational KPIs */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          label="Total Tons Delivered"
-          value={formatTons(a.totalTons)}
-          icon={Scale}
-          accent="chart-4"
-        />
-        <StatCard
-          label="Total Truck Trips"
-          value={formatNumber(a.truckCount)}
-          icon={TruckIcon}
-          accent="primary"
-        />
-        <StatCard
-          label="Purchase Cost"
-          value={formatPKR(a.purchaseCost)}
-          icon={ShoppingCart}
-          accent="chart-6"
-          hint="All time"
-        />
-        <StatCard
-          label="Selling Revenue"
-          value={formatPKR(a.salesRevenue)}
-          icon={Banknote}
-          accent="chart-2"
-          hint="All time"
-        />
+      <div>
+        <SectionLabel>Operations</SectionLabel>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 stagger">
+          <StatCard
+            label="Total Tons Delivered"
+            value={formatTons(a.totalTons)}
+            icon={Scale}
+            accent="chart-4"
+          />
+          <StatCard
+            label="Total Truck Trips"
+            value={formatNumber(a.truckCount)}
+            icon={TruckIcon}
+            accent="primary"
+          />
+          <StatCard
+            label="Purchase Cost"
+            value={formatPKR(a.purchaseCost)}
+            icon={ShoppingCart}
+            accent="chart-6"
+            hint="All time"
+          />
+          <StatCard
+            label="Selling Revenue"
+            value={formatPKR(a.salesRevenue)}
+            icon={Banknote}
+            accent="chart-2"
+            hint="All time"
+          />
+        </div>
       </div>
 
       {/* Charts */}
@@ -221,45 +262,41 @@ export default async function DashboardPage() {
             <CardTitle>Recent Truck Trips</CardTitle>
             <Link
               href="/trucks"
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              className="flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:gap-1.5"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardHeader>
           <CardContent className="p-0">
-            {recentTrucks.length === 0 ? (
-              <EmptyRow text="No truck trips yet." />
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Truck</TableHead>
-                    <TableHead>Material</TableHead>
-                    <TableHead className="text-right">Net Profit</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTrucks.map((t) => {
-                    const f = computeTruckRow(t);
-                    return (
-                      <TableRow key={t.id}>
-                        <TableCell className="whitespace-nowrap text-muted-foreground">
-                          {formatDate(t.date)}
-                        </TableCell>
-                        <TableCell className="font-medium">{t.truckNumber}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{t.materialType}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right tabular font-medium text-success">
-                          {formatPKR(f.netProfit)}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            )}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Truck</TableHead>
+                  <TableHead>Material</TableHead>
+                  <TableHead className="text-right">Net Profit</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentTrucks.map((t) => {
+                  const f = computeTruckRow(t);
+                  return (
+                    <TableRow key={t.id}>
+                      <TableCell className="whitespace-nowrap text-muted-foreground">
+                        {formatDate(t.date)}
+                      </TableCell>
+                      <TableCell className="font-medium">{t.truckNumber}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{t.materialType}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right tabular font-semibold text-success">
+                        {formatPKR(f.netProfit)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
 
@@ -268,14 +305,16 @@ export default async function DashboardPage() {
             <CardTitle>Recent Payments</CardTitle>
             <Link
               href="/payments"
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              className="flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:gap-1.5"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {recentPayments.length === 0 ? (
-              <EmptyRow text="No payments recorded yet." />
+              <p className="px-5 py-12 text-center text-sm text-muted-foreground">
+                No payments recorded yet.
+              </p>
             ) : (
               <Table>
                 <TableHeader>
@@ -298,7 +337,7 @@ export default async function DashboardPage() {
                       <TableCell className="max-w-[120px] truncate text-muted-foreground">
                         {p.reference || "—"}
                       </TableCell>
-                      <TableCell className="text-right tabular font-medium">
+                      <TableCell className="text-right tabular font-semibold">
                         {formatPKR(Number(p.amount))}
                       </TableCell>
                     </TableRow>
@@ -309,14 +348,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-}
-
-function EmptyRow({ text }: { text: string }) {
-  return (
-    <div className="px-5 py-10 text-center text-sm text-muted-foreground">
-      {text}
     </div>
   );
 }

@@ -16,12 +16,37 @@ export interface NavItem {
   primary?: boolean; // shown in mobile bottom bar
 }
 
-export const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, primary: true },
-  { href: "/trucks", label: "Trucks", icon: Truck, primary: true },
-  { href: "/payments", label: "Payments", icon: Wallet, primary: true },
-  { href: "/tracking", label: "Tracking", icon: CalendarRange },
-  { href: "/analytics", label: "Analytics", icon: TrendingUp, primary: true },
-  { href: "/reports", label: "Reports", icon: FileText, primary: true },
-  { href: "/settings", label: "Settings", icon: Settings },
+export interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+export const navSections: NavSection[] = [
+  {
+    label: "Overview",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, primary: true },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { href: "/trucks", label: "Trucks", icon: Truck, primary: true },
+      { href: "/payments", label: "Payments", icon: Wallet, primary: true },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { href: "/tracking", label: "Tracking", icon: CalendarRange },
+      { href: "/analytics", label: "Analytics", icon: TrendingUp, primary: true },
+      { href: "/reports", label: "Reports", icon: FileText, primary: true },
+    ],
+  },
+  {
+    label: "System",
+    items: [{ href: "/settings", label: "Settings", icon: Settings }],
+  },
 ];
+
+export const navItems: NavItem[] = navSections.flatMap((s) => s.items);

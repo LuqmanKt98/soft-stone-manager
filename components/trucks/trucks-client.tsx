@@ -2,7 +2,17 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Search, Truck as TruckIcon } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  Truck as TruckIcon,
+  Scale,
+  Banknote,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -18,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useToast } from "@/components/ui/toast";
 import { TruckForm } from "./truck-form";
 import { computeTruckRow, computeTotals } from "@/lib/calculations";
@@ -77,14 +88,19 @@ export function TrucksClient({
   return (
     <div className="space-y-4">
       {/* Summary strip */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <MiniStat label="Trips" value={String(totals.truckCount)} />
-        <MiniStat label="Tons" value={formatTons(totals.totalTons)} />
-        <MiniStat label="Revenue" value={formatPKR(totals.salesRevenue, { compact: true })} />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 stagger">
+        <MiniStat label="Trips" value={String(totals.truckCount)} icon={TruckIcon} />
+        <MiniStat label="Tons" value={formatTons(totals.totalTons)} icon={Scale} />
+        <MiniStat
+          label="Revenue"
+          value={formatPKR(totals.salesRevenue, { compact: true })}
+          icon={Banknote}
+        />
         <MiniStat
           label="Net Profit"
           value={formatPKR(totals.netProfit, { compact: true })}
           tone="positive"
+          icon={TrendingUp}
         />
       </div>
 
@@ -118,20 +134,20 @@ export function TrucksClient({
 
           <div className="mt-4">
             {filtered.length === 0 ? (
-              <div className="flex flex-col items-center gap-3 py-16 text-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                  <TruckIcon className="h-6 w-6 text-muted-foreground" />
-                </span>
-                <div>
-                  <p className="font-medium">No truck trips found</p>
-                  <p className="text-sm text-muted-foreground">
-                    Add your first trip to start tracking profit.
-                  </p>
-                </div>
-                <Button onClick={openAdd} variant="outline">
-                  <Plus className="h-4 w-4" /> Add Trip
-                </Button>
-              </div>
+              <EmptyState
+                icon={TruckIcon}
+                title={query || material !== "all" ? "No matching trips" : "No truck trips yet"}
+                description={
+                  query || material !== "all"
+                    ? "Try adjusting your search or material filter."
+                    : "Add your first trip to start tracking profit and transport savings."
+                }
+                action={
+                  <Button onClick={openAdd}>
+                    <Plus className="h-4 w-4" /> Add Trip
+                  </Button>
+                }
+              />
             ) : (
               <Table>
                 <TableHeader>
@@ -248,21 +264,30 @@ function MiniStat({
   label,
   value,
   tone,
+  icon: Icon,
 }: {
   label: string;
   value: string;
   tone?: "positive";
+  icon?: LucideIcon;
 }) {
   return (
-    <Card className="p-4">
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p
-        className={`mt-1 text-lg font-semibold tabular ${
-          tone === "positive" ? "text-success" : ""
-        }`}
-      >
-        {value}
-      </p>
+    <Card className="flex items-center gap-3 p-4 card-elevated">
+      {Icon && (
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </span>
+      )}
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <p
+          className={`mt-0.5 text-lg font-semibold tabular ${
+            tone === "positive" ? "text-success" : ""
+          }`}
+        >
+          {value}
+        </p>
+      </div>
     </Card>
   );
 }

@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { useToast } from "@/components/ui/toast";
 import { PaymentForm } from "./payment-form";
@@ -53,7 +54,7 @@ export function PaymentsClient({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 stagger">
         <StatCard
           label="Total Billed"
           value={formatPKR(billed)}
@@ -104,17 +105,16 @@ export function PaymentsClient({
         </CardHeader>
         <CardContent className="p-0">
           {payments.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-16 text-center">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Wallet className="h-6 w-6 text-muted-foreground" />
-              </span>
-              <div>
-                <p className="font-medium">No payments recorded</p>
-                <p className="text-sm text-muted-foreground">
-                  Record a payment when the company pays.
-                </p>
-              </div>
-            </div>
+            <EmptyState
+              icon={Wallet}
+              title="No payments recorded"
+              description="Record a payment when the company pays to track your outstanding balance."
+              action={
+                <Button onClick={() => setFormOpen(true)}>
+                  <Plus className="h-4 w-4" /> Record Payment
+                </Button>
+              }
+            />
           ) : (
             <Table>
               <TableHeader>

@@ -10,6 +10,7 @@ export default async function TrucksPage() {
   return (
     <div>
       <PageHeader
+        eyebrow="Operations"
         title="Truck Management"
         description="Record every truck trip. Profit and transport savings are calculated automatically."
       />

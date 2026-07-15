@@ -14,6 +14,7 @@ export default async function ReportsPage() {
   return (
     <div>
       <PageHeader
+        eyebrow="Insights"
         title="Reports"
         description="Generate and export professional reports for any period."
       />

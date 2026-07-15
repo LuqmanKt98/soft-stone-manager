@@ -13,6 +13,7 @@ export default async function PaymentsPage() {
   return (
     <div>
       <PageHeader
+        eyebrow="Operations"
         title="Payment Management"
         description="Track invoices, partial payments and outstanding receivables from the company."
       />

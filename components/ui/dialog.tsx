@@ -56,7 +56,7 @@ export function DialogContent({
       role="dialog"
       aria-modal="true"
       className={cn(
-        "relative z-50 my-8 w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-xl animate-in",
+        "relative z-50 my-8 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-pop animate-scale",
         className,
       )}
     >

@@ -10,6 +10,7 @@ export default async function SettingsPage() {
   return (
     <div>
       <PageHeader
+        eyebrow="System"
         title="Settings"
         description="Configure default rates and manage your data."
       />
