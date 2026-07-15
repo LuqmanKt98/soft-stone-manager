@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens — derived from the validated data-viz reference palette.
+ * Light + dark are both hand-stepped (dark is not an auto-flip).
+ */
+:root {
+  --background: #f4f4f1;
+  --foreground: #0b0b0b;
+  --card: #ffffff;
+  --card-foreground: #0b0b0b;
+  --popover: #ffffff;
+  --popover-foreground: #0b0b0b;
+  --primary: #2a78d6;
+  --primary-foreground: #ffffff;
+  --secondary: #f0efec;
+  --secondary-foreground: #1b1b1a;
+  --muted: #f0efec;
+  --muted-foreground: #52514e;
+  --accent: #eaf2fd;
+  --accent-foreground: #184f95;
+  --destructive: #d03b3b;
+  --destructive-foreground: #ffffff;
+  --success: #0ca30c;
+  --success-foreground: #ffffff;
+  --warning: #fab219;
+  --warning-foreground: #4a3600;
+  --border: #e1e0d9;
+  --input: #e4e3dc;
+  --ring: #2a78d6;
+  --radius: 0.85rem;
+
+  /* Categorical chart palette (light steps) */
+  --chart-1: #2a78d6;
+  --chart-2: #008300;
+  --chart-3: #e87ba4;
+  --chart-4: #eda100;
+  --chart-5: #1baf7a;
+  --chart-6: #eb6834;
+  --chart-7: #4a3aa7;
+  --chart-8: #e34948;
+
+  /* Chart chrome */
+  --chart-grid: #e1e0d9;
+  --chart-axis: #898781;
+  --chart-surface: #ffffff;
+}
+
+.dark {
+  --background: #0b0b0c;
+  --foreground: #f7f7f5;
+  --card: #17181a;
+  --card-foreground: #f7f7f5;
+  --popover: #17181a;
+  --popover-foreground: #f7f7f5;
+  --primary: #3987e5;
+  --primary-foreground: #ffffff;
+  --secondary: #24252a;
+  --secondary-foreground: #ececec;
+  --muted: #212226;
+  --muted-foreground: #a6a59c;
+  --accent: #16283f;
+  --accent-foreground: #9ec5f4;
+  --destructive: #e05656;
+  --destructive-foreground: #ffffff;
+  --success: #0ca30c;
+  --success-foreground: #ffffff;
+  --warning: #fab219;
+  --warning-foreground: #241900;
+  --border: #2a2b2f;
+  --input: #303137;
+  --ring: #3987e5;
+
+  --chart-1: #3987e5;
+  --chart-2: #2ba52b;
+  --chart-3: #d55181;
+  --chart-4: #c98500;
+  --chart-5: #199e70;
+  --chart-6: #d95926;
+  --chart-7: #9085e9;
+  --chart-8: #e66767;
+
+  --chart-grid: #2c2c2a;
+  --chart-axis: #8f8e87;
+  --chart-surface: #17181a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 0.25rem);
+  --radius-sm: calc(var(--radius) - 0.4rem);
+
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Thin, quiet scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-in {
+  animation: fade-in-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Recharts polish */
+.recharts-cartesian-axis-tick-value {
+  font-size: 11px;
+}
+.recharts-default-tooltip {
+  border-radius: 0.6rem !important;
+}
